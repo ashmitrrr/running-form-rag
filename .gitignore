@@ -1,0 +1,9 @@
+data/raw/
+data/processed/
+*.mp4
+*.mov
+.venv/
+__pycache__/
+*.lancedb
+.env
+.DS_Store
