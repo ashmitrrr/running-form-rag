@@ -1,0 +1,5 @@
+# Locally run Multimodal RAG for Running Form Analysis
+
+A fully offline AI system that analyzes running training data by combining pose-estimation video analysis, GPS/health metrics, and training logs into a single queryable multimodal RAG pipeline. Running footage is processed with YOLOv8-pose to extract body keypoints per frame, which are turned into running biomechanics metrics (cadence, trunk lean, knee angle, vertical oscillation, arm symmetry), these sit alongside health app data (pace, HR, splits) and Whisper-transcribed voice notes in a LanceDB store. A LangGraph agent running qwen3:14b locally via Ollama/MLX answers natural-language questions like "show me sessions where my form dropped after the 5k mark" using a hybrid retrieval pattern like a structured time-series analysis tool over the biomechanics and health data, and plus vector search over video segments and transcripts. Everything runs on device on a mac machine with no cloud dependency and no API costs, so training data never leaves the machine. 
+
+(in development)
