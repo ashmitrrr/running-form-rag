@@ -54,3 +54,54 @@ def compute_metrics(keypoints_path: str, fps: float = FPS):
 
     trunk_angles = _angle_from_vertical(hip_x, hip_y, sh_x, sh_y)
     results["trunk_lean_deg"] = round(float(trunk_angles.mean()), 1)
+
+    #knee angle (footstrike)
+    # compute knee angle each frame, then average it specifically at footstrike frames
+    # use the side with stronger ankle confidence as the "lead" leg for footstrike timing
+    knee_angles_at_strike = []
+    for side in ["left", "right"]:
+        ankle_y = df[f"{side}_ankle_y"].values
+        ankle_y_smooth = pd.Series(ankle_y).rolling(window=3, center=True, min_periods=1).mean().values
+        strike_frames, _ = find_peaks(ankle_y_smooth, distance=10)
+
+        for f in strike_frames:
+            angle = _joint_angle(
+                df[f"{side}_hip_x"].iloc[f], df[f"{side}_hip_y"].iloc[f],
+                df[f"{side}_knee_x"].iloc[f], df[f"{side}_knee_y"].iloc[f],
+                df[f"{side}_ankle_x"].iloc[f], df[f"{side}_ankle_y"].iloc[f],
+            )
+            knee_angles_at_strike.append(angle)
+
+    results["knee_angle_footstrike_deg"] = round(float(np.mean(knee_angles_at_strike)), 1)
+
+    # VO
+    hip_mid_y = hip_y.values
+    hip_mid_y_smooth = pd.Series(hip_mid_y).rolling(window=3, center=True, min_periods=1).mean().values
+    # use the std-based amplitude: peak-to-trough spread of vertical position
+    oscillation = (np.percentile(hip_mid_y_smooth, 95) - np.percentile(hip_mid_y_smooth, 5))
+    results["vertical_oscillation_px"] = round(float(oscillation), 1)
+
+    # arm swing
+    # elbow angle (shoulder elbow wrist) for each arm, averaged and report
+    # smaller delta = more symmetric arm swing
+    arm_angles = {}
+    for side in ["left", "right"]:
+        angles = []
+        for f in range(len(df)):
+            angle = _joint_angle(
+                df[f"{side}_shoulder_x"].iloc[f], df[f"{side}_shoulder_y"].iloc[f],
+                df[f"{side}_elbow_x"].iloc[f], df[f"{side}_elbow_y"].iloc[f],
+                df[f"{side}_wrist_x"].iloc[f], df[f"{side}_wrist_y"].iloc[f],
+            )
+            angles.append(angle)
+        arm_angles[side] = np.mean(angles)
+
+    results["arm_symmetry_delta_deg"] = round(float(abs(arm_angles["left"] - arm_angles["right"])), 1)
+
+    return results
+
+
+if __name__ == "__main__":
+    out = compute_metrics("data/processed/test_clip_keypoints.parquet")
+    for k, v in out.items():
+        print(f"{k}: {v}")
