@@ -122,3 +122,18 @@ def compute_form_score(keypoints_path, fps=FPS, window_sec=5.0,
     ).round(1)
 
     return wm
+
+
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) < 2:
+        print("Usage: python src/biomechanics/form_score.py <keypoints_parquet> [fps] [window_sec]")
+        sys.exit(1)
+
+    path = sys.argv[1]
+    fps = float(sys.argv[2]) if len(sys.argv) >= 3 else FPS
+    window = float(sys.argv[3]) if len(sys.argv) >= 4 else 5.0
+
+    result = compute_form_score(path, fps=fps, window_sec=window)
+    cols = ["window", "t_start_sec", "form_score"] + [f"{m}_score" for m in METRIC_WEIGHTS]
+    print(result[cols].to_string(index=False))
