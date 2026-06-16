@@ -37,7 +37,19 @@ def extract_keypoints(video_path: str, output_path: str):
     return df
 
 if __name__ == "__main__":
-    extract_keypoints(
-        "data/raw/test_clip.mp4",
-        "data/processed/test_clip_keypoints.parquet",
-    )
+    import sys
+
+    if len(sys.argv) < 2:
+        print("Usage: python src/pose/extract.py <input_video> [output_parquet]")
+        sys.exit(1)
+
+    video_path = sys.argv[1]
+    # default output name derived from input filename
+    if len(sys.argv) >= 3:
+        output_path = sys.argv[2]
+    else:
+        from pathlib import Path
+        stem = Path(video_path).stem
+        output_path = f"data/processed/{stem}_keypoints.parquet"
+
+    extract_keypoints(video_path, output_path)

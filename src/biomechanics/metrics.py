@@ -102,6 +102,16 @@ def compute_metrics(keypoints_path: str, fps: float = FPS):
 
 
 if __name__ == "__main__":
-    out = compute_metrics("data/processed/test_clip_keypoints.parquet")
+    import sys
+
+    if len(sys.argv) < 2:
+        print("Usage: python src/biomechanics/metrics.py <keypoints_parquet> [fps]")
+        print("Example: python src/biomechanics/metrics.py data/processed/onspot_run_keypoints.parquet 29.88")
+        sys.exit(1)
+
+    keypoints_path = sys.argv[1]
+    fps = float(sys.argv[2]) if len(sys.argv) >= 3 else FPS
+
+    out = compute_metrics(keypoints_path, fps=fps)
     for k, v in out.items():
         print(f"{k}: {v}")
