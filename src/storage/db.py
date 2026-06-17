@@ -25,7 +25,7 @@ def ingest_session(form_df: pd.DataFrame, session_id: str, session_date: str = N
     df.insert(1, "session_date", session_date)
 
     db = get_db()
-    existing_tables = db.list_tables()
+    existing_tables = db.list_tables().tables
 
     if TABLE_NAME in existing_tables:
         table = db.open_table(TABLE_NAME)
@@ -46,7 +46,7 @@ def ingest_session(form_df: pd.DataFrame, session_id: str, session_date: str = N
 def query_session(session_id: str = None):
     """Return all windows, optionally filtered to one session."""
     db = get_db()
-    if TABLE_NAME not in db.list_tables():
+    if TABLE_NAME not in db.list_tables().tables:
         print("No data stored yet.")
         return pd.DataFrame()
 
