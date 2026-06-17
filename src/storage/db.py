@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime
 from pathlib import Path
 
-DB_PATH = "data/lancedb"
+DB_PATH = str(Path(__file__).resolve().parents[2] / "data" / "lancedb")
 TABLE_NAME = "form_metrics"
 
 
