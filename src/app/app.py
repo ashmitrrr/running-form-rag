@@ -3,12 +3,7 @@ Gradio UI for the local-first running form analysis agent.
 
 Run from the PROJECT ROOT with:
     python src/app/app.py
-
-Then open the local URL it prints (usually http://127.0.0.1:7860).
-
-Left: session picker + quick stats + form-score chart.
-Right: chat with the agent.
-Everything runs locally against your existing agent + LanceDB store.
+    
 """
 
 import sys
