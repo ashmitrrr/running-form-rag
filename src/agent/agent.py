@@ -5,7 +5,7 @@ sys.path.append(str(Path(__file__).resolve().parents[1]))  # make 'src' importab
 
 from langchain_ollama import ChatOllama
 from langchain_core.tools import tool
-from langgraph.prebuilt import create_react_agent
+from langchain.agents import create_agent
 
 from storage.db import query_session, find_form_drops
 
@@ -72,7 +72,7 @@ Keep answers concise and specific."""
 def build_agent():
     llm = ChatOllama(model="qwen3:14b", temperature=0)
     tools = [get_form_drops, get_session_summary, list_sessions]
-    agent = create_react_agent(llm, tools, prompt=SYSTEM_PROMPT)
+    agent = create_agent(llm, tools, prompt=SYSTEM_PROMPT)
     return agent
 
 
